@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>График родителей</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--tx:#1f2328;--mut:#6b7280;--bd:#e3e0d8;--g:#b8e8c9;--gt:#0f5c38;--o:#ffd8a6;--ot:#7a4300;--r:#f6c4c4;--rt:#8e1f1f;--acc:#2f6fed;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#16181c;--card:#20242a;--tx:#e8eaed;--mut:#9aa3af;--bd:#343a43;--g:#1d4a33;--gt:#8fe6b5;--o:#4d3515;--ot:#f5c27a;--r:#4d2224;--rt:#f4a0a0;--acc:#7aa2ff}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#16181c;--card:#20242a;--tx:#e8eaed;--mut:#9aa3af;--bd:#343a43;--g:#1d4a33;--gt:#8fe6b5;--o:#4d3515;--ot:#f5c27a;--r:#4d2224;--rt:#f4a0a0;--acc:#7aa2ff}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;max-width:560px;margin:0 auto;padding:14px 12px 40px}
+h1{font-size:20px;margin:4px 0 12px}h2{font-size:16px;margin:22px 0 8px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:10px}
+button{font:inherit;color:inherit;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:8px 12px;cursor:pointer}
+button.on,button.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.seg{display:flex;gap:6px;margin-bottom:10px}.seg button{flex:1;padding:10px 4px}
+.nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+#cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.wd{text-align:center;font-size:12px;color:var(--mut)}
+.day{display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 0;min-height:66px;border-radius:10px;border:2px solid transparent;font-size:12px}
+.day.g,.pill.g,.chips .g{background:var(--g);color:var(--gt)}.day.o,.pill.o{background:var(--o);color:var(--ot)}.day.r,.pill.r{background:var(--r);color:var(--rt)}
+.day.sel{border-color:var(--tx)}.day.today b{text-decoration:underline}.day b{font-size:14px}.day small{font-size:11px;min-height:14px}
+.dots{display:flex;gap:3px;min-height:9px}
+.dot{width:9px;height:9px;border-radius:50%;border:2px solid var(--c);display:inline-block;flex:none}
+.dot.w{background:var(--c)}.dot.o{background:transparent}.dot.v{border-radius:2px;background:var(--c);opacity:.45}
+.pill{border-radius:10px;padding:8px 10px;margin:6px 0;font-weight:500}
+.hint{color:var(--mut);font-size:13px}.leg{display:flex;gap:10px;flex-wrap:wrap;font-size:13px;margin-top:8px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:4px;vertical-align:-2px;margin-right:4px}
+.who{display:flex;gap:8px;align-items:flex-start;margin-top:10px}.who .dot{margin-top:6px}
+.ov{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.ov button{padding:3px 9px;font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chips button{font-size:14px;padding:6px 10px}
+.row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+input,select{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:7px 8px;width:100%;min-width:0}
+input[type=color]{width:46px;height:38px;padding:2px;flex:none}input[type=checkbox]{width:20px;height:20px;flex:none}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+label{font-size:13px;color:var(--mut);display:flex;flex-direction:column;gap:3px}
+label.ck{flex-direction:row;align-items:center;gap:8px;font-size:15px;color:var(--tx);margin-top:8px}
+.srow{display:grid;grid-template-columns:52px 1fr 54px 54px 34px;gap:6px;align-items:center;margin-top:6px;font-size:14px}
+.srow button{padding:6px 0}.srow input{padding:7px 4px;text-align:center}
+details{margin-top:8px}summary{color:var(--mut);font-size:14px;cursor:pointer}
+.vac{display:flex;gap:6px;align-items:center;margin-top:6px;font-size:14px;flex-wrap:wrap}.vac input{flex:1 1 110px;width:auto}
+</style></head><body>
+<h1>📅 График родителей</h1>
+<div class="seg" id="seg"><button data-f="apt">🏠 Квартира</button><button data-f="car">🚗 Машина</button><button data-f="both">🏠+🚗 Оба</button></div>
+<div class="card">
+ <div class="nav"><button id="pv">‹</button><b id="mt"></b><button id="nx">›</button></div>
+ <div id="cal"></div>
+ <div class="leg" id="leg"></div>
+ <div class="hint" style="margin-top:6px">Точки: ● работает, ○ дома, ▪ отпуск. Нажмите на день для подробностей.</div>
+</div>
+<div class="card" id="day"></div>
+<h2 id="uph"></h2>
+<div class="card"><div class="chips" id="up"></div></div>
+<h2>Люди и графики</h2>
+<div id="people"></div>
+<button class="pri" id="add">+ Добавить человека</button>
+<script>
+const KEY='parents-schedule-v3',$=s=>document.querySelector(s);
+const MN=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],WD=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+const PAL=['#e4572e','#2f6fed','#2a9d8f','#b5179e','#f4a300','#6a994e'];
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const dn=s=>{const[a,b,c]=s.split('-').map(Number);return Math.round(Date.UTC(a,b-1,c)/864e5)};
+const iso=n=>new Date(n*864e5).toISOString().slice(0,10);
+const tod=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const fh=h=>String(h).padStart(2,'0')+':00';
+const D=(s,e)=>({t:'d',s,e}),K=()=>({t:'24',s:8,e:8});
+const mk=(name,c,shifts,R,car)=>({name,color:c,shifts,R,anchor:tod(),car,vac:[],over:{}});
+let S=null;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S||!Array.isArray(S.people))S={people:[mk('Папа',PAL[0],[K(),D(10,20),D(10,20)],1,true),mk('Мама',PAL[1],[D(8,18),D(8,18)],2,false)],month:tod().slice(0,7),sel:tod(),filter:'apt'};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+
+function cyc(p,n){const W=p.shifts.length,L=W+(+p.R);if(!p.anchor||!(L>0))return-1;const i=(((n-dn(p.anchor))%L)+L)%L;return i<W?i:-1}
+function st(p,n){const o=(p.over||{})[iso(n)];if(o)return o;
+ for(const v of p.vac||[])if(v.from&&v.to&&n>=dn(v.from)&&n<=dn(v.to))return'v';
+ return cyc(p,n)>=0?'w':'o'}
+function shiftOf(p,n){if(st(p,n)!=='w')return null;const i=cyc(p,n);return p.shifts[i>=0?i:0]||D(8,18)}
+function away(p,n){const a=Array(24).fill(false),s=shiftOf(p,n),q=shiftOf(p,n-1);
+ if(s){if(s.t==='24')for(let h=+s.s;h<24;h++)a[h]=true;else for(let h=+s.s;h<+s.e&&h<24;h++)a[h]=true}
+ if(q&&q.t==='24')for(let h=0;h<+q.e;h++)a[h]=true;return a}
+function runs(a){const r=[];let s=-1;for(let h=0;h<=24;h++){const v=h<24&&a[h];if(v&&s<0)s=h;if(!v&&s>=0){r.push([s,h]);s=-1}}return r}
+const fr=r=>r.map(x=>fh(x[0])+'–'+fh(x[1])).join(', ');
+// окно, когда все родители ушли из дома
+function win(n){const aw=S.people.map(p=>away(p,n));return runs(Array.from({length:24},(_,h)=>aw.length>0&&aw.every(a=>a[h])))}
+// квартира: g — все на работе, o — кто-то дома, r — все дома
+function apt(n){const w=S.people.filter(p=>st(p,n)==='w').length;return!S.people.length?'r':w===S.people.length?'g':w>0?'o':'r'}
+// машина недоступна только в день суток её владельца
+const carFree=n=>!S.people.some(p=>{const s=p.car&&shiftOf(p,n);return s&&s.t==='24'});
+function lvl(n){const a=apt(n),c=carFree(n);if(S.filter==='apt')return a;if(S.filter==='car')return c?'g':'r';
+ const sc=(a==='g'?1:0)+(c?1:0);return sc===2?'g':sc===1?'o':'r'}
+const best=n=>win(n).sort((a,b)=>(b[1]-b[0])-(a[1]-a[0]))[0];
+
+function renderCal(){
+ const[y,m]=S.month.split('-').map(Number),first=Date.UTC(y,m-1,1)/864e5;
+ const wd=(new Date(Date.UTC(y,m-1,1)).getUTCDay()+6)%7,dim=new Date(Date.UTC(y,m,0)).getUTCDate();
+ $('#mt').textContent=MN[m-1]+' '+y;
+ let h=WD.map(d=>`<div class="wd">${d}</div>`).join('')+'<div></div>'.repeat(wd);
+ for(let i=0;i<dim;i++){const n=first+i,k=iso(n),b=best(n);
+  const dots=S.people.map(p=>`<i class="dot ${st(p,n)}" style="--c:${p.color}"></i>`).join('');
+  h+=`<button class="day ${lvl(n)}${k===S.sel?' sel':''}${k===tod()?' today':''}" data-d="${k}"><b>${i+1}</b><span class="dots">${dots}</span><small>${S.filter!=='car'&&b?b[0]+'–'+b[1]:''}</small><small>${S.filter!=='apt'?(carFree(n)?'🚗':'⛔'):''}</small></button>`}
+ $('#cal').innerHTML=h;
+ document.querySelectorAll('#seg button').forEach(x=>x.classList.toggle('on',x.dataset.f===S.filter));
+ const L={apt:['все на работе — квартира свободна','кто-то дома','все дома'],car:['машина доступна','','машина недоступна (сутки)'],both:['свободно всё','свободно что-то одно','ничего не свободно']}[S.filter];
+ $('#leg').innerHTML=['g','o','r'].map((c,i)=>L[i]?`<span><i class="sw" style="background:var(--${c})"></i>${L[i]}</span>`:'').join('')}
+
+function renderDay(){
+ const n=dn(S.sel),a=apt(n),w=win(n);
+ let h=`<b>${new Date(n*864e5).toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long',timeZone:'UTC'})}</b>`;
+ if(!S.people.length)h+='<div class="hint">Добавьте людей ниже.</div>';
+ else{const home=S.people.filter(p=>st(p,n)!=='w').map(p=>esc(p.name));
+  h+=`<div class="pill ${a}">🏠 ${a==='g'?'Квартира свободна: все на работе':a==='o'?'Дома: '+home.join(', '):'Все дома'}${w.length?'<br><small>Все ушли: '+fr(w)+'</small>':''}</div>`;
+  const co=S.people.filter(p=>{const s=p.car&&shiftOf(p,n);return s&&s.t==='24'});
+  h+=`<div class="pill ${co.length?'r':'g'}">🚗 Машина: ${co.length?'недоступна (у '+co.map(p=>esc(p.name)).join(', ')+' на сутках)':'доступна'}</div>`}
+ S.people.forEach((p,i)=>{const s=st(p,n),sh=shiftOf(p,n),q=shiftOf(p,n-1),o=(p.over||{})[S.sel];let t;
+  if(sh)t=sh.t==='24'?`сутки: с ${fh(sh.s)} до ${fh(sh.e)} следующего дня`:`на работе ${fh(sh.s)}–${fh(sh.e)}`;
+  else t=s==='v'?'отпуск':'выходной';
+  if(q&&q.t==='24')t+=` · с суток вернулся к ${fh(q.e)}`;
+  const b=(v,l)=>`<button class="${(o||'')===v?'on':''}" data-i="${i}" data-o="${v}">${l}</button>`;
+  h+=`<div class="who"><i class="dot ${s}" style="--c:${p.color}"></i><div><b>${esc(p.name)}</b>: ${t}${o?' <span class="hint">(вручную)</span>':''}<div class="ov">${b('','Авто')}${b('w','Работа')}${b('o','Выходной')}${b('v','Отпуск')}</div></div></div>`});
+ $('#day').innerHTML=h}
+
+function renderUp(){const t=dn(tod());let h='',c=0;
+ $('#uph').textContent={apt:'Ближайшие дни: квартира свободна',car:'Ближайшие дни: машина доступна',both:'Ближайшие дни: свободно и то и другое'}[S.filter];
+ for(let n=t;n<t+60&&c<20;n++){const a=apt(n)==='g',cf=carFree(n);
+  if(!(S.filter==='apt'?a:S.filter==='car'?cf:a&&cf))continue;c++;
+  const d=new Date(n*864e5).toLocaleDateString('ru-RU',{weekday:'short',day:'numeric',month:'numeric',timeZone:'UTC'}),b=best(n);
+  h+=`<button class="g" data-go="${iso(n)}">${d}${S.filter!=='car'&&b?' · '+b[0]+'–'+b[1]:''}</button>`}
+ $('#up').innerHTML=h||'<span class="hint">В ближайшие 60 дней таких дней нет.</span>'}
+
+function renderPeople(){
+ $('#people').innerHTML=S.people.map((p,i)=>`<div class="card" data-i="${i}">
+ <div class="row"><input data-k="name" value="${esc(p.name)}" placeholder="Имя"><input type="color" data-k="color" value="${p.color}"><button data-del>Удалить</button></div>
+ <div class="hint">Рабочие дни подряд (каждый можно настроить отдельно):</div>
+ ${p.shifts.map((s,j)=>`<div class="srow" data-j="${j}"><b>День ${j+1}</b><select data-s="t"><option value="d"${s.t==='d'?' selected':''}>Дневная</option><option value="24"${s.t==='24'?' selected':''}>Сутки</option></select><input type="number" min="0" max="23" data-s="s" value="${s.s}" title="Уходит в час"><input type="number" min="0" max="24" data-s="e" value="${s.e}" title="${s.t==='24'?'Возвращается на следующее утро в час':'Приходит в час'}"><button data-sdel>✕</button></div>`).join('')}
+ <div class="hint" style="margin-top:4px">Поля: уходит в (час) и приходит в (час). Для суток — час возвращения на следующее утро.</div>
+ <button data-sadd style="margin-top:6px">+ Рабочий день</button>
+ <div class="grid" style="margin-top:10px">
+ <label>Потом отдыхает дней<input type="number" min="0" data-k="R" value="${p.R}"></label>
+ <label>Дата первого рабочего дня<input type="date" data-k="anchor" value="${p.anchor||''}"></label></div>
+ <label class="ck"><input type="checkbox" data-k="car"${p.car?' checked':''}>Машина у него: недоступна в дни суток</label>
+ <details><summary>Отпуск${(p.vac||[]).length?' ('+p.vac.length+')':''}</summary>
+ ${(p.vac||[]).map((v,j)=>`<div class="vac">${v.from} → ${v.to}<button data-vdel="${j}">✕</button></div>`).join('')}
+ <div class="vac"><input type="date" class="vf"><input type="date" class="vt"><button data-vadd>Добавить</button></div></details>
+ </div>`).join('')}
+
+function refresh(){renderCal();renderDay();renderUp()}
+function all(){save();renderPeople();refresh()}
+$('#seg').onclick=e=>{const b=e.target.closest('[data-f]');if(b){S.filter=b.dataset.f;save();refresh()}};
+$('#cal').onclick=e=>{const b=e.target.closest('[data-d]');if(b){S.sel=b.dataset.d;save();renderCal();renderDay()}};
+$('#day').onclick=e=>{const b=e.target.closest('[data-o]');if(!b)return;const p=S.people[+b.dataset.i];p.over=p.over||{};
+ if(b.dataset.o)p.over[S.sel]=b.dataset.o;else delete p.over[S.sel];save();refresh()};
+$('#up').onclick=e=>{const b=e.target.closest('[data-go]');if(b){S.sel=b.dataset.go;S.month=S.sel.slice(0,7);save();refresh()}};
+$('#people').addEventListener('input',e=>{const t=e.target,c=t.closest('[data-i]');if(!c)return;const p=S.people[+c.dataset.i];
+ if(t.dataset.s){const s=p.shifts[+t.closest('[data-j]').dataset.j];if(t.type==='number'){if(t.value==='')return;s[t.dataset.s]=+t.value}else s[t.dataset.s]=t.value;if(t.tagName==='SELECT'&&t.value==='24'){s.s=s.s||8}save();refresh();return}
+ if(!t.dataset.k)return;
+ if(t.type==='number'){if(t.value==='')return;p[t.dataset.k]=+t.value}else p[t.dataset.k]=t.type==='checkbox'?t.checked:t.value;
+ save();refresh()});
+$('#people').onclick=e=>{const c=e.target.closest('[data-i]');if(!c)return;const p=S.people[+c.dataset.i],b=e.target.closest('button');if(!b)return;
+ if(b.matches('[data-del]')){if(!b.dataset.arm){b.dataset.arm=1;b.textContent='Точно?';return}S.people.splice(+c.dataset.i,1);all()}
+ else if(b.matches('[data-sadd]')){p.shifts.push({...p.shifts[p.shifts.length-1]||D(8,18)});all()}
+ else if(b.matches('[data-sdel]')){if(p.shifts.length>1){p.shifts.splice(+b.closest('[data-j]').dataset.j,1);all()}}
+ else if(b.matches('[data-vdel]')){p.vac.splice(+b.dataset.vdel,1);all()}
+ else if(b.matches('[data-vadd]')){const f=c.querySelector('.vf').value,t=c.querySelector('.vt').value||f;if(!f)return;
+  p.vac=p.vac||[];p.vac.push(t<f?{from:t,to:f}:{from:f,to:t});all()}};
+$('#add').onclick=()=>{S.people.push(mk('Новый человек',PAL[S.people.length%PAL.length],[D(8,18)],2,false));all()};
+const shift=d=>{let[y,m]=S.month.split('-').map(Number);m+=d;if(m<1){m=12;y--}if(m>12){m=1;y++}S.month=y+'-'+String(m).padStart(2,'0');save();renderCal()};
+$('#pv').onclick=()=>shift(-1);$('#nx').onclick=()=>shift(1);
+renderPeople();refresh();
+</script></body></html>
